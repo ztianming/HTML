@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<!-- saved from url=(0040)http://www.webhek.com/misc-res/duckhunt/ -->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <!--base-->
+    <title>狙击野鸭：一个HTML5 + JavaScript游戏</title>
+    <meta name="description"
+          content="这款简单而有趣的游戏是使用HTML5+js开发完成的，需要提醒大家注意的是，你需要使用支持HTML5的浏览器才能玩这个游戏，也就是说，你需要使用火狐浏览器或谷歌浏览器。游戏中，如果自定义参数设置的过于夸张，很可能会导致你的浏览器崩溃。回合时间是指鸭子飞走前的飞行时间。难度值可以是1-10，是来控制鸭子的飞行速度的。高于8的难度都属于有些夸张。鸭子数和子弹数都有个上限——你可以输入任何值，如果数目设的太大，程序是不会显示的。">
+    <link rel="shortcut icon" href="http://www.webhek.com/misc-res/duckhunt/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery.color.js"></script>
+    <script src="js/duckhunt.js"></script>
+    <script src="js/jquery.spritely-0.6.js" type="text/javascript"></script>
+
+</head>
+<body>
+<div id="header">
+    <h1>狙击野鸭：一个HTML5 + JavaScript游戏</h1></div>
+<div style="cursor:pointer;z-index:5;width:900px;margin:0 auto;">
+    <span onclick="muteAll();" id="mute">消音</span>
+
+    <div style="width:400px; float:right; text-align:right;">返回  &nbsp;
+    </div>
+</div>
+<div id="gameField" style="background-color: rgb(100, 176, 255);">
+
+
+    <div id="game">
+        <div id="theFlash"></div>
+        <div id="tree"></div>
+        <div id="grass"></div>
+        <div id="theDog" style="bottom: -10px; background-position: -276px 0px;"></div>
+        <div id="sniffDog"
+             style="bottom: 75px; left: 240px; display: none; background-image: url(images/jumpDog.png); background-position: 0px 0px;"></div>
+        <div id="theDuck4" class="deadDuck" style="top: -200px; left: 460px; background-position: 0px -73px;"></div>
+        <div id="theDuck5" class="deadDuck" style="top: -200px; left: 460px; background-position: 0px -73px;"></div>
+    </div>
+
+    <div class="gameinfo" id="ammo" style="display: block;">
+        <strong>子弹: </strong><img src="images/bullet.png" align="absmiddle">
+        <img src="images/bullet.png" align="absmiddle">
+        <img src="images/bullet.png" align="absmiddle">
+    </div>
+
+    <div class="gameinfo" id="waves" style="display: block;">回合 3 / 3</div>
+    <div class="gameinfo" id="ducksKilled" style="display: block;">
+        <img src="images/duckLive.png">
+        <img src="images/duckLive.png">
+        <img src="images/duckLive.png">
+        <img src="images/duckLive.png">
+        <img src="images/duckLive.png">
+        <img src="images/duckLive.png">
+    </div>
+
+    <div class="gameinfo" id="scoreboard" style="display: block;">0</div>
+    <div id="loser" class="messages" style="display: block;">
+        就这水平，你在逗我玩吗？
+        <br><br>
+
+        <div class="tryAgain" onclick="tryAgain();">再玩一次</div>
+    </div>
+
+
+    <div id="winner" class="messages" style="display: none;">
+        冠军诞生了，就是你！
+    </div>
+
+
+    <div id="level" class="messages" style="display: none;">第1关</div>
+
+</div>
+
+<div id="levelCreate" style="width:900px;margin:0 auto;"><br>
+    <strong>难度设置：</strong><br>
+    回合: <input id="LCwaves" name="LCwaves" size="3" type="text" value="1"> &nbsp; &nbsp; 鸭子初始数:
+    <input name="LCducks" id="LCducks" size="3" type="text" value="2"> &nbsp;
+    &nbsp; 子弹初始数: <input type="text" name="LCbullets" id="LCbullets" size="3" value="4"> &nbsp; &nbsp;
+    每回合时间 (秒):  <input type="text" name="LCwavetime" id="LCwavetime" size="3" value="10"> &nbsp; &nbsp;
+    难度: <input type="text" name="LCdif" id="LCdif" size="3" value="5">
+
+    <div id="doit"
+         style="margin-left:15px;display:inline;padding:5px;border:solid;width:100px;text-align:center;cursor:pointer;"
+         onclick="makeLevel()">使用这个设置
+    </div>
+    <br><br>
+    <small>
+        这款简单而有趣的游戏是使用HTML5+js开发完成的，需要提醒大家注意的是，你需要使用支持HTML5的浏览器才能玩这个游戏，也就是说，你需要使用火狐浏览器或谷歌浏览器。游戏中，如果自定义参数设置的过于夸张，很可能会导致你的浏览器崩溃。回合时间是指鸭子飞走前的飞行时间。难度值可以是1-10，是来控制鸭子的飞行速度的。高于8的难度都属于有些夸张。鸭子数和子弹数都有个上限——你可以输入任何值，如果数目设的太大，程序是不会显示的。
+    </small>
+</div>
+
+
+<audio class="sounds" id="gunSound" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/gunSound.ogg">
+    <source type="audio/mp3" src="sounds/gunSound.mp3">
+</audio>
+
+<audio class="sounds" id="gunSound2" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/gunSound2.ogg">
+    <source type="audio/mp3" src="sounds/gunSound2.mp3">
+</audio>
+
+<audio class="sounds" id="laugh" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/laugh.ogg">
+
+    <source type="audio/mp3" src="sounds/laugh.mp3">
+</audio>
+
+<audio class="sounds" id="quak" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/quak.ogg">
+    <source type="audio/mp3" src="sounds/quak.mp3">
+</audio>
+
+<audio class="sounds" id="thud" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/thud.ogg">
+    <source type="audio/mp3" src="sounds/thud.mp3">
+</audio>
+
+<audio class="sounds" id="ohyeah" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/ohYeah.ogg">
+    <source type="audio/mp3" src="sounds/ohYeah.mp3">
+</audio>
+
+<audio class="sounds" id="wings" loop="loop" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/wings.ogg">
+    <source type="audio/mp3" src="sounds/wings.mp3">
+</audio>
+
+<audio class="sounds" id="quacking" loop="loop" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/quacking.ogg">
+    <source type="audio/mp3" src="sounds/quacking.mp3">
+</audio>
+
+
+<audio class="sounds" id="sniff" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/sniff.ogg">
+    <source type="audio/mp3" src="sounds/sniff.mp3">
+</audio>
+
+<audio class="sounds" id="bark" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/barkDucks.ogg">
+    <source type="audio/mp3" src="sounds/barkDucks.mp3">
+</audio>
+
+<audio class="sounds" id="champSound" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/champ.ogg">
+    <source type="audio/mp3" src="sounds/champ.mp3">
+</audio>
+
+<audio class="sounds" id="loserSound" preload="auto" style="display: none;">
+    <source type="audio/ogg" src="sounds/loserSound.ogg">
+    <source type="audio/mp3" src="sounds/loserSound.mp3">
+</audio>
+
+<div id="info"></div>
+<!--util.js-->
+<!--ga.js-->
+
+<div id="__nightingale_view_cover"
+     style="width: 100%; height: 100%; transition: -webkit-transform 10s ease-in-out;
+     position: fixed !important; left: 0px !important; bottom: 0px !important;
+     overflow: hidden !important; pointer-events: none !important; z-index: 2147483647;
+     opacity: 0; background: rgb(0, 0, 0) !important;">
+
+</div>
+</body>
+<style type="text/css" id="174538949007"></style>
+</html>

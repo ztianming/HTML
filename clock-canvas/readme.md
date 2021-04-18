@@ -6,11 +6,11 @@
 
 ### 时钟效果
 
-![clock](img\clock.gif)
+![clock](img/clock.gif)
 
 ### 倒计时效果
 
-![countdown](img\countdown.gif)
+![countdown](img/countdown.gif)
 
 
 
